@@ -1,5 +1,7 @@
 # block2gca
-*Python script that adds the next block production slot event to google calendar*  
+*Python script that adds the next block production slot event to google calendar* 
+
+<img align=center src="./google_cal.png" alt="Google Calendar" width="30%">
 
 **NEVER MISS A BLOCK PRODUCTION SLOT AGAIN !!**
 
