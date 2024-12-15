@@ -1,0 +1,9 @@
+{
+  "LAST_PROCESSED_FILE": "{FULL_PATH_TO_STORE_LAST_PROCESSED_SLOT_TIMESTAMP}/last_processed.txt",
+  "OUTPUT_FILE": "{FULL_PATH_TO_STORE_CURRENT_SLOT_TIMESTAMP}/timestamp.txt",
+  "GRAPHQL_URL": "http://localhost:3085/graphql",
+  "TOKEN_FILE": "{FULL_PATH_TO_GOOGLE_CALENDAR_API_OAUTH_TOKEN}/token.json",
+  "CREDENTIALS_FILE": "{FULL_PATH_TO_GOOGLE_CALENDAR_API_CREDENTIALS}/credentials.json",
+  "CALENDAR_ID": "{CALENDAR_ID}@group.calendar.google.com",
+  "SCOPES": ["https://www.googleapis.com/auth/calendar"]
+}
