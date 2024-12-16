@@ -28,6 +28,7 @@ def fetch_and_process_block_start(config):
     """
     Fetches the next block production start time from a GraphQL endpoint,
     calculates the time difference, and saves the block start time to a file.
+    Returns block_start, slot, epoch, and globalSlot.
     """
     current_epoch = int(time.time() * 1000)  # Current epoch time in milliseconds
     GRAPHQL_URL = config["GRAPHQL_URL"]
@@ -35,7 +36,7 @@ def fetch_and_process_block_start(config):
 
     # GraphQL query
     QUERY = {
-        "query": "query{daemonStatus{nextBlockProduction{times{blockStart:startTime}}}}"
+        "query": "query{daemonStatus{nextBlockProduction{times{blockStart:startTime slot epoch globalSlot}}}}"
     }
 
     # Send GraphQL query
@@ -44,38 +45,41 @@ def fetch_and_process_block_start(config):
         response.raise_for_status()
     except requests.RequestException as e:
         print(f"Error while making the GraphQL request: {e}")
-        return
+        return None, None, None, None
 
     # Parse the response
     try:
         result = response.json()
     except json.JSONDecodeError:
         print("Error decoding the JSON response.")
-        return
+        return None, None, None, None
 
     print(json.dumps(result, indent=2))  # Optional: Debug response
 
-    # Extract blockStart
+    # Extract blockStart, slot, epoch, globalSlot
     try:
         block_start = int(result["data"]["daemonStatus"]["nextBlockProduction"]["times"][0]["blockStart"])
     except (KeyError, IndexError, TypeError):
         print("Error extracting blockStart from the response.")
-        return
+        block_start = None
 
-    # Calculate time difference
-    difference_ms = block_start - current_epoch
-    seconds = difference_ms // 1000
-    minutes = seconds // 60
-    hours = minutes // 60
-    days = hours // 24
-    seconds %= 60
-    minutes %= 60
-    hours %= 24
+    try:
+        slot = int(result["data"]["daemonStatus"]["nextBlockProduction"]["times"][0]["slot"])
+    except (KeyError, IndexError, TypeError):
+        print("Error extracting slot from the response.")
+        slot = None
 
-    print(f"Current Epoch: {current_epoch}")
-    print(f"Block Start: {block_start}")
-    print(f"Difference (ms): {difference_ms}")
-    print(f"Days: {days}, Hours: {hours}, Minutes: {minutes}, Seconds: {seconds}")
+    try:
+        epoch = int(result["data"]["daemonStatus"]["nextBlockProduction"]["times"][0]["epoch"])
+    except (KeyError, IndexError, TypeError):
+        print("Error extracting epoch from the response.")
+        epoch = None
+
+    try:
+        globalSlot = int(result["data"]["daemonStatus"]["nextBlockProduction"]["times"][0]["globalSlot"])
+    except (KeyError, IndexError, TypeError):
+        print("Error extracting globalSlot from the response.")
+        globalSlot = None
 
     # Save blockStart to file
     try:
@@ -83,6 +87,8 @@ def fetch_and_process_block_start(config):
             f.write(str(block_start))
     except IOError as e:
         print(f"Error writing to file {OUTPUT_FILE}: {e}")
+
+    return block_start, slot, epoch, globalSlot
 
 
 # Main function
@@ -100,7 +106,12 @@ def main():
     # Load configuration
     config = load_config(args.config)
 
-    fetch_and_process_block_start(config)  # Process block start
+    # Fetch block_start, slot, epoch, globalSlot
+    block_start, slot, epoch, globalSlot = fetch_and_process_block_start(config)
+
+    if block_start is None or slot is None or epoch is None or globalSlot is None:
+        print("Error: Failed to fetch required data. Exiting.")
+        return
 
     # OAuth2 Authentication
     creds = None
@@ -138,7 +149,7 @@ def main():
 
     # Create event details
     event = {
-        "summary": "Block Production",
+        "summary": f"Epoch {epoch}, Slot {slot}/{globalSlot} Block Production",
         "location": "Paris, France",
         "description": "Block Production Slot",
         "start": {
