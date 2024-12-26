@@ -123,12 +123,25 @@ def main():
         creds = Credentials.from_authorized_user_file(TOKEN_FILE, SCOPES)
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
+            try:
+                print("Refreshing expired access token...")
+                creds.refresh(Request())
+                print("Access token refreshed successfully.")
+            except Exception as e:
+                print(f"Error refreshing token: {e}")
+                print("Attempting re-authentication...")
+                flow = InstalledAppFlow.from_client_secrets_file(CREDENTIALS_FILE, SCOPES)
+                creds = flow.run_local_server(port=0)
         else:
+            print("No valid credentials found. Starting authentication flow...")
             flow = InstalledAppFlow.from_client_secrets_file(CREDENTIALS_FILE, SCOPES)
             creds = flow.run_local_server(port=0)
-        with open(TOKEN_FILE, "w") as token:
-            token.write(creds.to_json())
+
+    # Save the credentials to the token file for future use
+    with open(TOKEN_FILE, "w") as token:
+       token_data = creds.to_json()
+       token.write(token_data)
+       print(f"Token data written to {TOKEN_FILE}: {token_data}")
 
     # Initialize Google Calendar API
     service = build("calendar", "v3", credentials=creds)
