@@ -2,6 +2,7 @@
 *Python script that adds the next block production slot event to google calendar* 
 
 <img align=center src="./google_cal.png" alt="Google Calendar" width="100%">
+<img align=center src="./google_cal2.png" alt="Block Details" width="100%">
 
 **NEVER MISS A BLOCK PRODUCTION SLOT AGAIN !!**
 
