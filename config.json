@@ -5,5 +5,9 @@
   "TOKEN_FILE": "{FULL_PATH_TO_GOOGLE_CALENDAR_API_OAUTH_TOKEN}/token.json",
   "CREDENTIALS_FILE": "{FULL_PATH_TO_GOOGLE_CALENDAR_API_CREDENTIALS}/credentials.json",
   "CALENDAR_ID": "{CALENDAR_ID}@group.calendar.google.com",
+  "CONSENSUS_FILE": "{FULL_PATH_TO_CONSENSUS_FILE}/consensus.json",  
+  "BLOCK_HEIGHT": "{FULL_PATH_TO_BLOCK_HEIGHT_FILE}/block_height.txt",
+  "PUBLIC_ADDRESS": "YOUR_PUBLIC_NODE_ADDRESS",
+  "BLOCK_WINNER_FILE" : "{FULL_PATH_TO_BLOCK_WINNER_INFORMATION}/block_winner.json",
   "SCOPES": ["https://www.googleapis.com/auth/calendar"]
 }
