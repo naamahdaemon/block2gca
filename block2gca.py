@@ -262,6 +262,17 @@ def main():
             flow = InstalledAppFlow.from_client_secrets_file(CREDENTIALS_FILE, SCOPES)
             creds = flow.run_local_server(port=0)
 
+    if creds and creds.expiry and creds.expiry - datetime.utcnow() < timedelta(minutes=5):
+        try:
+            print("Proactively refreshing token about to expire...")
+            creds.refresh(Request())
+            print("Access token refreshed successfully.")
+        except Exception as e:
+            print(f"Error refreshing token: {e}")
+            print("Attempting re-authentication...")
+            flow = InstalledAppFlow.from_client_secrets_file(CREDENTIALS_FILE, SCOPES)
+            creds = flow.run_local_server(port=0)
+
     # Save the credentials to the token file for future use
     with open(TOKEN_FILE, "w") as token:
        token_data = creds.to_json()
@@ -279,8 +290,8 @@ def main():
     LAST_PROCESSED_FILE = config["LAST_PROCESSED_FILE"]
     last_processed = get_last_processed_timestamp(LAST_PROCESSED_FILE)
     
-    if last_processed == timestamp:
-        print("Timestamp has not changed. No event created.")
+    if last_processed == timestamp or timestamp is None:
+        print("Timestamp has not changed or no next block. No event created.")
         return
 
     # Convert timestamp to ISO 8601
